@@ -4,6 +4,7 @@ import torchvision
 import data
 from torchinfo import summary
 import pickle
+import os
 
 class VITEncoder(nn.Module):
     def __init__(self):
@@ -23,6 +24,15 @@ class VITEncoder(nn.Module):
         return self.vit(x)
 
 
+def save_state(embeddings, file_name):
+    dest = os.path.join('.','embeddings')
+    os.makedirs(dest, exist_ok=True)
+    
+    with open(os.path.join(dest,file_name), 'wb') as file:
+        # Serialize the object using pickle and write it to the file
+        pickle.dump(embeddings, file)
+        print(f"Object saved to '{file_name}'")
+
 def compute_img_embeddings(model, batch_size = 4):
     img_captions = data.get_flickr8k_captions()
     dataset = data.ImageDataset(img_captions)
@@ -30,6 +40,8 @@ def compute_img_embeddings(model, batch_size = 4):
     model.to(device)
     embeddings = {}
     batch = []
+    save_at = batch_size * 10
+    file_index = 1
     for i, c in enumerate(img_captions):
         if c[0] in embeddings:
             continue
@@ -42,11 +54,15 @@ def compute_img_embeddings(model, batch_size = 4):
             updated_dict = {b[1]:output[i] for i,b in enumerate(batch)}
             embeddings.update(updated_dict)
             batch = []
+        if i > 0 and i % save_at == 0:
+            save_state(embeddings, f'embeddings_{file_index}.bin')
+            file_index += 1
+            for k in embeddings:
+                embeddings[k] = None
     
-    with open('embeddings.bin', 'wb') as file:
-        # Serialize the object using pickle and write it to the file
-        pickle.dump(embeddings, file)
-        print(f"Object saved to 'embeddings.bin'")
+    save_state(embeddings, f'embeddings_{file_index}.bin')
+
+            
 
         
 
