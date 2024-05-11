@@ -47,6 +47,7 @@ def compute_img_embeddings(model, batch_size = 8):
         if c[0] in visited:
             continue
         img, caption = dataset[i]
+        img.to(device)
         print(i,c[0],caption,sep=',')
         visited.add(c[0])
         batch.append((img, c[0]))
