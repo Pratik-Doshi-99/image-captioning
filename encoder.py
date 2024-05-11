@@ -66,10 +66,43 @@ def compute_img_embeddings(model, batch_size = 8):
 
         
 
+def compute_embeddings_fast(model, batch_size = 8):
+    img_captions = data.get_flickr8k_captions()
+    dataset = data.ImageDataset(img_captions)
+    device = data.get_default_device()
+    image_index = {}
+    model.to(device)
+    cumm_tensor = None
+    batch = []
+    for i, c in enumerate(img_captions):
+        if c[0] in image_index:
+            continue
+        img, caption = dataset[i]
+        #img = img.to(device)
+        print(i,c[0],caption,sep=',')
+        image_index[c[0]] = i
+        batch.append(img)
+        if len(batch) == batch_size:
+            batch = torch.stack(batch).to(device)
+            output = model(batch)
+            cumm_tensor = torch.cat((cumm_tensor, output),0) if cumm_tensor is not None else output
+            output = None
+            print('Tensor Shape',cumm_tensor.shape)
+            batch = []
+
+    if batch:
+        batch = torch.stack(batch)
+        output = model(batch)
+        cumm_tensor = torch.cat((cumm_tensor, output),0) if cumm_tensor is not None else output
+        batch = []
+    save_state(cumm_tensor, 'embeddings.bin')
+    save_state(image_index, 'img_embedding_map.bin')
+
 
 
 
 if __name__ == '__main__':
     model = VITEncoder()
-    #print(summary(model, input_size=(1,3,224,224),col_names=["input_size", "output_size", "num_params", "trainable"]))
-    compute_img_embeddings(model)
+    #print(summary(model, input_size=(1,3,224,224),col_names=["input_size", "output_size", "num_params", "trainable"])) 
+    #compute_img_embeddings(model)
+    compute_embeddings_fast(model, batch_size = 8)
