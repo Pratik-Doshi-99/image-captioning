@@ -1,5 +1,5 @@
-# cse244-image-captioning
-Image Captioning Project for CSE 244, Spring 2024
+# Image Captioning using Transformers
+Image Captioning Project
 
 
 ## Data
