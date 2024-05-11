@@ -18,11 +18,13 @@ def load_data_from_pickle(filename):
     return data
 
 # Example usage
-filename = 'embeddings_1.bin'  # Specify the path to your pickle file
+filename = 'embeddings_20.bin'  # Specify the path to your pickle file
 
 # Load data from the pickle file
 loaded_data = load_data_from_pickle(filename)
 
 # Print the loaded data (you can also perform any other operation on the data)
 print("Loaded data:")
-print(loaded_data)
+print('Data')
+for k in loaded_data:
+    print(k, loaded_data[k].shape)

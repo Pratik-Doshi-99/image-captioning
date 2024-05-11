@@ -22,7 +22,7 @@ class BaselineGRU(nn.Module):
         image_features = self.vit(image)  # shape: (batch_size, embed_size)
         
         # Pass the captions and image features through the GRU
-        # image_features is unsqueezed to match the expected dimensions (batch_size, 1, embed_size)
+        # image_features is unsqueezed to match the expected dimensions (1, batch_size, embed_size)
         output, hidden = self.gru(captions, image_features.unsqueeze(0))
         
         # Pass the output through the fully connected layer to get the vocabulary size

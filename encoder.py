@@ -33,21 +33,22 @@ def save_state(embeddings, file_name):
         pickle.dump(embeddings, file)
         print(f"Object saved to '{file_name}'")
 
-def compute_img_embeddings(model, batch_size = 4):
+def compute_img_embeddings(model, batch_size = 8):
     img_captions = data.get_flickr8k_captions()
     dataset = data.ImageDataset(img_captions)
     device = data.get_default_device()
+    visited = set()
     model.to(device)
     embeddings = {}
     batch = []
     save_at = batch_size * 10
     file_index = 1
     for i, c in enumerate(img_captions):
-        if c[0] in embeddings:
+        if c[0] in visited:
             continue
         img, caption = dataset[i]
         print(i,c[0],caption,sep=',')
-        embeddings[c[0]] = None
+        visited.add(c[0])
         batch.append((img, c[0]))
         if len(batch) == batch_size:
             output = model(torch.stack([b[0] for b in batch]))
@@ -57,8 +58,7 @@ def compute_img_embeddings(model, batch_size = 4):
         if i > 0 and i % save_at == 0:
             save_state(embeddings, f'embeddings_{file_index}.bin')
             file_index += 1
-            for k in embeddings:
-                embeddings[k] = None
+            embeddings = {}
     
     save_state(embeddings, f'embeddings_{file_index}.bin')
 
