@@ -47,12 +47,11 @@ def compute_img_embeddings(model, batch_size = 8):
         if c[0] in visited:
             continue
         img, caption = dataset[i]
-        img.to(device)
         print(i,c[0],caption,sep=',')
         visited.add(c[0])
         batch.append((img, c[0]))
         if len(batch) == batch_size:
-            output = model(torch.stack([b[0] for b in batch]))
+            output = model(torch.stack([b[0] for b in batch]).to(device))
             updated_dict = {b[1]:output[i] for i,b in enumerate(batch)}
             embeddings.update(updated_dict)
             batch = []
