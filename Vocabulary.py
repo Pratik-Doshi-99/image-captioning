@@ -74,6 +74,22 @@ class Vocabulary(object):
         for token in tokens:
             self.add_word(token)
 
+    def get_word(self, idx):
+        """Return the word corresponding to an index."""
+        return self.idx2word[idx]
+    
+    def get_index(self, word):
+        """Return the index corresponding to a word."""
+        return self.word2idx[word]
+    
+    def get_word2idx(self):
+        """Return the word2idx dictionary."""
+        return self.word2idx
+    
+    def get_idx2word(self):
+        """Return the idx2word dictionary."""
+        return self.idx2word
+
     def __call__(self, word):
         """Convert a word to its corresponding index in the vocabulary"""
         if not word in self.word2idx:
