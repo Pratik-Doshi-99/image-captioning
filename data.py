@@ -8,8 +8,8 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 
 # Replace with your ZIP file URL
-#DATASET = 'https://gitlab.nrp-nautilus.io/pratikdoshi/data_files/-/raw/main/image-captioning-project/flickr8k.zip' #Flick8k
-DATASET = 'https://gitlab.nrp-nautilus.io/pratikdoshi/data_files/-/raw/main/image-captioning-project/flickr8k_m.zip'  #Test dataset
+DATASET = 'https://gitlab.nrp-nautilus.io/pratikdoshi/data_files/-/raw/main/image-captioning-project/flickr8k.zip' #Flick8k
+#DATASET = 'https://gitlab.nrp-nautilus.io/pratikdoshi/data_files/-/raw/main/image-captioning-project/flickr8k_m.zip'  #Test dataset
 # Specify the directory where the file should be downloaded
 DOWNLOAD_DIRECTORY = os.path.join('.','data') # current directory
 # the name of the directory inside the zip which has the Images sub directory and captions.txt file
