@@ -1,0 +1,29 @@
+import torch
+import torch.nn as nn
+import decoderLSTM
+import encoderCNN as encoder
+class EncoderDecoder(nn.Module):
+    def __init__(self,embed_size, hidden_size, vocab_size, num_layers=3,drop_prob=0.3):
+        super().__init__()
+        self.encoder = encoder.EncoderCNN(embed_size)
+        self.decoder = decoderLSTM.DecoderRNN(embed_size,hidden_size,vocab_size,num_layers,drop_prob)
+    
+    def forward(self, images, captions):
+        features = self.encoder(images)
+        outputs = self.decoder(features, captions)
+        return outputs
+    
+    def get_caption_for_image(self, image, vocabulary, max_length=20):
+        result_caption = []
+        with torch.no_grad():
+            x = self.encoder(image).unsqueeze(0) # unsqueeze to add batch dimension
+            states = None
+            for _ in range(max_length):
+                hiddens, states = self.decoder.lstm(x, states)
+                output = self.decoder.linear(hiddens.squeeze(0)) # squeeze to remove batch dimension
+                predicted = output.argmax(1)
+                result_caption.append(predicted.item())
+                x = self.decoder.embedding(predicted).unsqueeze(0)
+                if vocabulary.get_word(predicted.item()) == "<end>":
+                    break
+        return [vocabulary.get_word(idx) for idx in result_caption]
