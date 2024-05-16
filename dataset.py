@@ -111,12 +111,14 @@ def data_split(train_val_test=(0.7,0.15,0.15)):
     generate_captions_file(test_split, image_map, 'captions_test.txt')
 
 def generate_captions_file(dataset_keys, image_map, name):
-    lines = ['image,caption\n']
+    lines = []
     for k in dataset_keys:
         for c in image_map[k]:
-            lines.append(f'{k},{c}\n')
-    with open(os.path.join('data',name), 'w') as f:
-        f.writelines(lines)
+            lines.append((k,c))
+    df = pd.DataFrame(lines, columns=['image','caption'])
+    df.to_csv(os.path.join(DOWNLOAD_DIRECTORY, DEST_DIRECTORY, name),index=False)
+    # with open(os.path.join(DOWNLOAD_DIRECTORY, DEST_DIRECTORY, name), 'w') as f:
+    #     f.writelines(lines)
     
 
 
