@@ -8,9 +8,9 @@ import captionPreprocessing
 import urllib.request
 import zipfile
 import torchvision.transforms as transforms
+import numpy as np
 
-
-
+np.random.seed(123)
 
 
 '''
@@ -71,9 +71,63 @@ def get_default_device():
   else:
       return torch.device('cpu')
 
-device = get_default_device()
-# Download and unzip the ZIP file
-print(download_and_unzip(DATASET, DOWNLOAD_DIRECTORY, DEST_DIRECTORY))
+
+
+'''
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+##################################################################################################################################
+                                                Data Split
+'''
+
+
+def data_split(train_val_test=(0.7,0.15,0.15)):
+    print(f'Splitting Dataset: Train={train_val_test[0]}, Val={train_val_test[1]}, Test={train_val_test[2]}')
+    total = train_val_test[0] + train_val_test[1] + train_val_test[2]
+    assert total == 1, 'Train, Validation and Test split does not sum to 1'
+    #img_captions = get_flickr8k_captions()
+    img_captions = pd.read_csv(os.path.join(DOWNLOAD_DIRECTORY, DEST_DIRECTORY,'captions.txt'))
+    image_map = {}
+    #print(img_captions)
+    for i in range(img_captions.shape[0]):
+        img, caption = img_captions.iloc[i,0], img_captions.iloc[i,1]
+        if img in image_map:
+            image_map[img].append(caption)
+        else:
+            image_map[img] = [caption]
+        
+    rng = np.random.default_rng()
+    keys = np.array(list(image_map.keys()))
+    rng.shuffle(keys)
+    train_index = int(train_val_test[0] * len(keys))
+    val_index = train_index + int(train_val_test[1] * len(keys))
+    train_split = keys[:train_index]
+    val_split = keys[train_index:val_index]
+    test_split = keys[val_index:]
+
+    generate_captions_file(train_split, image_map, 'captions_train.txt')
+    generate_captions_file(val_split, image_map, 'captions_val.txt')
+    generate_captions_file(test_split, image_map, 'captions_test.txt')
+
+def generate_captions_file(dataset_keys, image_map, name):
+    lines = ['image,caption\n']
+    for k in dataset_keys:
+        for c in image_map[k]:
+            lines.append(f'{k},{c}\n')
+    with open(os.path.join('data',name), 'w') as f:
+        f.writelines(lines)
+    
+
+
+
+    
+
+
+
+
+
+
 
 
 '''
@@ -179,3 +233,13 @@ def get_flickr8k_captions(captions_path=None, skip_rows=1):
     
     captions = [c.strip('\n').split(',') for c in captions[skip_rows:]]
     return captions
+
+
+device = get_default_device()
+# Download and unzip the ZIP file
+print(download_and_unzip(DATASET, DOWNLOAD_DIRECTORY, DEST_DIRECTORY))
+data_split()
+
+
+if __name__ =='__main__':
+    pass
