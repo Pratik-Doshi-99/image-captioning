@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torchvision
-import data
+import dataset
 from torchinfo import summary
 import pickle
 import os
@@ -34,9 +34,9 @@ def save_state(embeddings, file_name):
         print(f"Object saved to '{file_name}'")
 
 def compute_img_embeddings(model, batch_size = 8):
-    img_captions = data.get_flickr8k_captions()
-    dataset = data.ImageDataset(img_captions)
-    device = data.get_default_device()
+    img_captions = dataset.get_flickr8k_captions()
+    dataset = dataset.ImageDataset(img_captions)
+    device = dataset.get_default_device()
     visited = set()
     model.to(device)
     embeddings = {}
@@ -67,9 +67,9 @@ def compute_img_embeddings(model, batch_size = 8):
         
 
 def compute_embeddings_fast(model, batch_size = 8):
-    img_captions = data.get_flickr8k_captions()
-    dataset = data.ImageDataset(img_captions)
-    device = data.get_default_device()
+    img_captions = dataset.get_flickr8k_captions()
+    dataset = dataset.ImageDataset(img_captions)
+    device = dataset.get_default_device()
     image_index = {}
     model.to(device)
     cumm_tensor = None
