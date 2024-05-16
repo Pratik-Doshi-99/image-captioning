@@ -1,10 +1,11 @@
-import data 
+import dataset
 import Vocabulary
 import captionPreprocessing
-caption_path = 'data/flickr8k_m/captions.txt'
-print("----------Geeting Flickr8k dataset ---------------")
+import pandas as pd
+caption_path = 'data/flickr8k/captions.txt'
+print("----------Getting Flickr8k dataset ---------------")
 
-image_caption_pairs = data.get_flickr8k_captions(captions_path=caption_path)
+image_caption_pairs = dataset.get_flickr8k_captions(captions_path=caption_path)
 print(type (image_caption_pairs))
 print(image_caption_pairs[0])
 captions_list = [inner_list[1] for inner_list in image_caption_pairs]
@@ -61,9 +62,17 @@ print(image_caption_indices[0])
 assert len(image_caption_indices[0][1]) == len(padded_captions[0]) 
 
 
+print("----------Splitting dataset into train, val and test ---------------")
+train_data_path = 'data/flickr8k/captions_train.txt'
+val_data_path = 'data/flickr8k/captions_val.txt'
+test_data_path = 'data/flickr8k/captions_test.txt'
 
+train_data = pd.read_csv(train_data_path)
+val_data = pd.read_csv(val_data_path)
+test_data = pd.read_csv(test_data_path)
 
-
-
-
+print('Training Samples:',train_data.shape[0])
+print('Validation Samples:',val_data.shape[0])
+print('Testing Samples:',test_data.shape[0])
+print("----------Splitting Completed ---------------")
 
