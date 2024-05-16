@@ -5,7 +5,7 @@ metadata:
 spec:
   containers:
   - name: mypod
-    image: ubuntu
+    image: pytorch/pytorch
     resources:
       limits:
         memory: 10Gi
