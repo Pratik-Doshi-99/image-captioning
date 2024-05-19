@@ -1,6 +1,9 @@
+certifi==2024.2.2
+charset-normalizer==3.3.2
 click==8.1.7
 filelock==3.14.0
 fsspec==2024.3.1
+idna==3.7
 Jinja2==3.1.4
 joblib==1.4.2
 MarkupSafe==2.1.5
@@ -10,8 +13,10 @@ nltk==3.8.1
 numpy==1.26.4
 pillow==10.3.0
 regex==2024.5.10
+requests==2.31.0
 sympy==1.12
 torch==2.3.0
+torchtext==0.18.0
 torchvision==0.18.0
 tqdm==4.66.4
 typing_extensions==4.11.0

@@ -1,12 +1,12 @@
 import torch
 import torch.nn as nn
 import decoderLSTM
-import encoderCNN as encoder
+import encoderCNN 
 class EncoderDecoder(nn.Module):
     def __init__(self,embed_size, hidden_size, vocab_size, num_layers=3,drop_prob=0.3):
         super().__init__()
-        self.encoder = encoder.EncoderCNN(embed_size)
-        self.decoder = decoderLSTM.DecoderRNN(embed_size,hidden_size,vocab_size,num_layers,drop_prob)
+        self.encoder = encoderCNN.EncoderCNN(embed_size)
+        self.decoder = decoderLSTM.decoderLSTM(embed_size,hidden_size,vocab_size,num_layers,drop_prob)
     
     def forward(self, images, captions):
         features = self.encoder(images)

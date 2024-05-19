@@ -37,12 +37,16 @@ class CaptionProprocessor:
         for caption in captions_list : 
             tokens = self.tokenizeCaption(caption.lower()) 
             max_caption_length = max(max_caption_length, len(tokens))
-        return max_caption_length
+        return max_caption_length + 2 # +2 for <start> and <end> tokens
     
     def convertCaptionToIndices(self, caption, max_caption_length, vocab = Vocabulary.Vocabulary(vocab_file='vocab.pkl', vocab_from_file=True)):
         tokens = self.padd_caption(caption, max_caption_length)
         caption_indices = [vocab(token) for token in tokens]
         return caption_indices
+    
+    def convertIndicesToCaption(self, indices, vocab = Vocabulary.Vocabulary(vocab_file='vocab.pkl', vocab_from_file=True)):
+        caption = [vocab.idx2word[index] for index in indices]
+        return caption
 
         
         
