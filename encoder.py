@@ -7,18 +7,20 @@ import pickle
 import os
 
 class VITEncoder(nn.Module):
-    def __init__(self):
+    def __init__(self, output_dimensions=None, train=False):
         super(VITEncoder, self).__init__()
         self.vit = torchvision.models.vit_l_16(weights=torchvision.models.ViT_L_16_Weights.IMAGENET1K_V1 )
-        self.vit.heads.head = nn.Identity()
-        # num_features = self.vit.heads.head.in_features
-        # self.vit.heads.head = nn.Sequential(
-        #             nn.Linear(num_features, output_dimensions),
-        #             #nn.ReLU(inplace=True),
-        #             #nn.Dropout(0.5),
-        #             #nn.Linear(linear_dim
-        # , output_dimensions),
-        #         )
+        
+        
+        for name, param in self.resnet.named_parameters():
+            param.requires_grad = train
+        
+        
+        if output_dimensions is None:
+            self.vit.heads.head = nn.Identity()
+        else:
+            num_features = self.vit.heads.head.in_features
+            self.vit.heads.head = nn.Linear(num_features, output_dimensions),
 
     def forward(self, x):
         return self.vit(x)

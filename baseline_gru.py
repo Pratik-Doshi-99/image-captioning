@@ -8,34 +8,40 @@ class BaselineGRU(nn.Module):
     def __init__(self, vocab_size, embed_size, hidden_size, num_layers=1):
         super(BaselineGRU, self).__init__()
         
-        # Load pretrained ViT model from timm library
         self.vit = VITEncoder(output_dimensions=embed_size)
         
+        self.embeddings = nn.Embedding(vocab_size, embed_size)
+
         # GRU for generating captions
         self.gru = nn.GRU(embed_size, hidden_size, num_layers, batch_first=True)
         
         # Output layer to generate predictions for each word in the vocabulary
         self.fc = nn.Linear(hidden_size, vocab_size)
     
-    def forward(self, image, captions, hidden=None):
+    def forward(self, image, captions):
+        '''
+        image: Preprocessed Image Tensor
+        captions: list of word indexes
+        '''
         # Process the image through the ViT model
         image_features = self.vit(image)  # shape: (batch_size, embed_size)
-        
+        caption_features = self.embeddings(captions)
+        img_caption_embedding = torch.cat((image_features.unsqueeze(1),caption_features),dim=1) 
         # Pass the captions and image features through the GRU
         # image_features is unsqueezed to match the expected dimensions (1, batch_size, embed_size)
-        output, hidden = self.gru(captions, image_features.unsqueeze(0))
+        output, _ = self.gru(img_caption_embedding)
         
         # Pass the output through the fully connected layer to get the vocabulary size
         output = self.fc(output)
         
-        return output, hidden
+        return output
 
 
 if __name__ == '__main__':
     # Hyperparameters
     vocab_size = 10000  # Size of the vocabulary (should match the dataset)
     embed_size = 256    # Embedding size
-    hidden_size = 512   # Hidden size in GRU
+    hidden_size = 256   # Hidden size in GRU
 
     # Instantiate the model
     model = BaselineGRU(vocab_size, embed_size, hidden_size)
