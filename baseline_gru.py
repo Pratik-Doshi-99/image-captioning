@@ -28,13 +28,17 @@ class BaselineGRU(nn.Module):
         caption_features = self.embeddings(captions)
         img_caption_embedding = torch.cat((image_features.unsqueeze(1),caption_features),dim=1) 
         # Pass the captions and image features through the GRU
-        # image_features is unsqueezed to match the expected dimensions (1, batch_size, embed_size)
+        # image_features is unsqueezed to match the expected dimensions (batch_size, 1, embed_size)
         output, _ = self.gru(img_caption_embedding)
         
         # Pass the output through the fully connected layer to get the vocabulary size
         output = self.fc(output)
         
         return output
+
+
+def train():
+    pass
 
 
 if __name__ == '__main__':
