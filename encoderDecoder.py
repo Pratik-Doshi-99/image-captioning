@@ -3,9 +3,9 @@ import torch.nn as nn
 import decoderLSTM
 import encoderCNN 
 class EncoderDecoder(nn.Module):
-    def __init__(self,embed_size, hidden_size, vocab_size, num_layers=3,drop_prob=0.3):
+    def __init__(self,embed_size, hidden_size, vocab_size, num_layers=3,drop_prob=0.3,train_CNN=False):
         super().__init__()
-        self.encoder = encoderCNN.EncoderCNN(embed_size)
+        self.encoder = encoderCNN.EncoderCNN(embed_size, train_CNN= train_CNN)
         self.decoder = decoderLSTM.decoderLSTM(embed_size,hidden_size,vocab_size,num_layers,drop_prob)
     
     def forward(self, images, captions):
