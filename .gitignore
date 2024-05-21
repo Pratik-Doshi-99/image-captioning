@@ -1,4 +1,4 @@
-data/*
+# data/*
 embeddings_*
 venv-env/*
 .ipynb_checkpoints/Training-checkpoint.ipynb

@@ -65,4 +65,9 @@
 ## See if the accuracy is a little better and check the whole flow if something we are doing is wrong 
 
 
+During training, we have the option to use a technique called "teacher forcing" to help the model learn. This means we can provide the correct captions as input during training, instead of using the model's own predictions.
+-- preprocessing of text -> lower-casing all the words (otherwise“hello” and “Hello” will be regarded as two separate words), removing special tokens (like ‘%’, ‘$’, ‘#’, etc.), 
+
+
+we can consider only those words which occur at least 10 times in the entire corpus.
 
