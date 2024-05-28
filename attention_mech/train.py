@@ -40,7 +40,7 @@ def main(args):
         captions_file=os.path.join(args.data, 'captions_val.txt'),
         batch_size=args.batch_size,
         transform=transform,
-        num_workers=2,
+        num_workers=1
     )
 
     train_dataset, train_loader = get_loader(
@@ -48,7 +48,7 @@ def main(args):
         captions_file=os.path.join(args.data, 'captions_train.txt'),
         batch_size=args.batch_size,
         transform=transform,
-        num_workers=2
+        num_workers=1
     )
 
 
