@@ -53,7 +53,7 @@ def main(args):
 
 
     model = EncoderDecoderAttention(256, 256, len(train_dataset.vocab))
-
+    model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     #scheduler = optim.lr_scheduler.StepLR(optimizer, args.step_size)
     cross_entropy_loss = nn.CrossEntropyLoss().to(device)
