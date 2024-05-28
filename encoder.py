@@ -35,6 +35,7 @@ def save_state(embeddings, file_name):
         pickle.dump(embeddings, file)
         print(f"Object saved to '{file_name}'")
 
+@torch.no_grad()
 def compute_img_embeddings(model, batch_size = 8):
     img_captions = dataset.get_flickr8k_captions()
     dataset = dataset.ImageDataset(img_captions)
@@ -53,21 +54,29 @@ def compute_img_embeddings(model, batch_size = 8):
         visited.add(c[0])
         batch.append((img, c[0]))
         if len(batch) == batch_size:
+            print('1',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             output = model(torch.stack([b[0] for b in batch]).to(device))
+            print('2',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             updated_dict = {b[1]:output[i] for i,b in enumerate(batch)}
+            print('3',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             embeddings.update(updated_dict)
+            print('4',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             batch = []
         if i > 0 and i % save_at == 0:
+            print('5',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             save_state(embeddings, f'embeddings_{file_index}.bin')
+            print('6',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             file_index += 1
             embeddings = {}
-    
+            print('7',torch.cuda.memory_allocated(device)//(1024**2),'MB')
+
     save_state(embeddings, f'embeddings_{file_index}.bin')
 
             
 
         
 
+@torch.no_grad()
 def compute_embeddings_fast(model, batch_size = 8):
     img_captions = dataset.get_flickr8k_captions()
     dataset = dataset.ImageDataset(img_captions)
@@ -76,21 +85,30 @@ def compute_embeddings_fast(model, batch_size = 8):
     model.to(device)
     cumm_tensor = None
     batch = []
+    i_count = 0
     for i, c in enumerate(img_captions):
         if c[0] in image_index:
             continue
         img, caption = dataset[i]
-        #img = img.to(device)
+        img = img.to(device)
         print(i,c[0],caption,sep=',')
-        image_index[c[0]] = i
+        image_index[c[0]] = i_count
+        i_count += 1
         batch.append(img)
         if len(batch) == batch_size:
-            batch = torch.stack(batch).to(device)
+            #print('1',torch.cuda.memory_allocated(device)//(1024**2),'MB')
+            batch = torch.stack(batch)
+            #print('2',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             output = model(batch)
+            #print('3',torch.cuda.memory_allocated(device)//(1024**2),'MB')
             cumm_tensor = torch.cat((cumm_tensor, output),0) if cumm_tensor is not None else output
-            output = None
-            print('Tensor Shape',cumm_tensor.shape)
+            #print('4',torch.cuda.memory_allocated(device)//(1024**2),'MB')
+            #del output
+            #print('Tensor Shape',cumm_tensor.shape,'Element Shape',cumm_tensor.element_size(), cumm_tensor.nelement())        
+            #print('5',torch.cuda.memory_allocated(device)//(1024**2),'MB')
+            #del batch
             batch = []
+            #print('6',torch.cuda.memory_allocated(device)//(1024**2),'MB')
 
     if batch:
         batch = torch.stack(batch)
