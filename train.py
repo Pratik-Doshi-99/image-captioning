@@ -40,7 +40,7 @@ def train():
         ]
     )
 
-    train_loader, train_dataset = get_loader(
+    train_dataset, train_loader = get_loader(
         root_folder="data/flickr8k/Images",
         captions_file="data/flickr8k/captions_train.txt",
         transform=transform,
