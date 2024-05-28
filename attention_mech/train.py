@@ -3,13 +3,14 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 from nltk.translate.bleu_score import corpus_bleu
-from tensorboard import SummaryWriter
+from torch.utils.tensorboard import SummaryWriter
 from torch.autograd import Variable
 from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 from encoderDecoder import EncoderDecoderAttention
-from dataset import ImageCaptionDataset
-from ..dataset import get_loader, device
+#from dataset import ImageCaptionDataset
+from dataset import get_loader, device
+import os
 
 
 from utils import accuracy, AverageMeter, calculate_caption_lengths
@@ -32,23 +33,26 @@ transform = transforms.Compose(
 
 def main(args):
     writer = SummaryWriter()
+    # root_path = os.path.join('.','..','data','flickr8k')
 
-
-
-    model = EncoderDecoderAttention()
     val_dataset, val_loader = get_loader(
-        root_folder="../data/flickr8k/Images",
-        captions_file="../data/flickr8k/captions_val.txt",
+        root_folder=os.path.join(args.data, 'Images'),
+        captions_file=os.path.join(args.data, 'captions_val.txt'),
+        batch_size=args.batch_size,
         transform=transform,
         num_workers=2,
     )
 
     train_dataset, train_loader = get_loader(
-        root_folder="../data/flickr8k/Images",
-        captions_file="../data/flickr8k/captions_train.txt",
+        root_folder=os.path.join(args.data, 'Images'),
+        captions_file=os.path.join(args.data, 'captions_train.txt'),
+        batch_size=args.batch_size,
         transform=transform,
         num_workers=2
     )
+
+
+    model = EncoderDecoderAttention(256, 256, len(train_dataset.vocab))
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     #scheduler = optim.lr_scheduler.StepLR(optimizer, args.step_size)
@@ -210,8 +214,8 @@ if __name__ == "__main__":
                         help='number of batches to wait before logging training stats (default: 100)')
     parser.add_argument('--data', type=str, default='data/coco',
                         help='path to data images (default: data/coco)')
-    parser.add_argument('--model', type=str, help='path to model')
-    parser.add_argument('--tf', action='store_true', default=True,
-                        help='Use teacher forcing when training LSTM (default: False)')
+    # parser.add_argument('--model', type=str, help='path to model')
+    # parser.add_argument('--tf', action='store_true', default=True,
+    #                     help='Use teacher forcing when training LSTM (default: False)')
 
     main(parser.parse_args())

@@ -1,7 +1,7 @@
 from attention import Attention
 import torch.nn as nn
 import torch
-from ..dataset import device
+from dataset import device
 
 class decoderAttentionLSTM(nn.Module):
     def __init__(self, vocabulary_size, encoder_dim, embed_size, hidden_size):

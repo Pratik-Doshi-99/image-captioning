@@ -31,7 +31,7 @@ def calculate_caption_lengths(vocab, captions):
     lengths = 0
     for caption_tokens in captions:
         for token in caption_tokens:
-            token = vocab.get_word(token)
+            token = vocab.get_word(token.item())
             if token in ('<start>','<end>','<pad>'):
                 continue
             else:
