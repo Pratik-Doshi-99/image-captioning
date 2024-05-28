@@ -66,10 +66,10 @@ def download_and_unzip(url, download_directory, dest_dir, filename='data.zip'):
 
 def get_default_device():
   """Pick GPU if available, else CPU"""
-  if torch.cuda.is_available():
-      return torch.device('cuda')
-  else:
-      return torch.device('cpu')
+  device = "cuda" if torch.cuda.is_available() else \
+         ("mps" if torch.backends.mps.is_available() else "cpu" ) 
+  return device
+
 
 
 

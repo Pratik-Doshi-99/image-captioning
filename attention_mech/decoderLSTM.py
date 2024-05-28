@@ -1,7 +1,7 @@
 from attention import Attention
 import torch.nn as nn
 import torch
-
+from ..dataset import device
 
 class decoderAttentionLSTM(nn.Module):
     def __init__(self, vocabulary_size, encoder_dim, embed_size, hidden_size):
@@ -42,15 +42,18 @@ class decoderAttentionLSTM(nn.Module):
         h, c = self.get_init_lstm_state(img_features)
         max_timespan = max([len(caption) for caption in captions]) - 1
 
-        prev_words = torch.zeros(batch_size, 1).long().cuda()
+        # prev_words = torch.zeros(batch_size, 1).long().cuda()
+        prev_words = torch.zeros(batch_size, 1).long().to(device)
         if self.use_tf:
             embedding = self.embedding(captions) if self.training else self.embedding(prev_words)
         else:
             embedding = self.embedding(prev_words)
 
-        preds = torch.zeros(batch_size, max_timespan, self.vocabulary_size).cuda()
+        # preds = torch.zeros(batch_size, max_timespan, self.vocabulary_size).cuda()
+        preds = torch.zeros(batch_size, max_timespan, self.vocabulary_size).to(device)
         # preds = batch * caption length * vocab size 
-        alphas = torch.zeros(batch_size, max_timespan, img_features.size(1)).cuda()
+        # alphas = torch.zeros(batch_size, max_timespan, img_features.size(1)).cuda()
+        alphas = torch.zeros(batch_size, max_timespan, img_features.size(1)).to(device)
         # alphas = batch * caption length * 49
 
         for t in range(max_timespan):
