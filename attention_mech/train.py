@@ -9,20 +9,25 @@ from torch.nn.utils.rnn import pack_padded_sequence
 from torchvision import transforms
 from encoderDecoder import EncoderDecoderAttention
 from dataset import ImageCaptionDataset
+from ..dataset import get_loader, device
 
 
 from utils import accuracy, AverageMeter, calculate_caption_lengths
 
+# data_transforms = transforms.Compose([
+#     transforms.Resize((224, 224)),
+#     transforms.ToTensor(),
+#     transforms.Normalize(mean=[0.485, 0.456, 0.406],
+#                          std=[0.229, 0.224, 0.225])
+# ])
 
-device = "cuda" if torch.cuda.is_available() else \
-         ("mps" if torch.backends.mps.is_available() else "cpu" ) 
-
-data_transforms = transforms.Compose([
-    transforms.Resize((224, 224)),
-    transforms.ToTensor(),
-    transforms.Normalize(mean=[0.485, 0.456, 0.406],
-                         std=[0.229, 0.224, 0.225])
-])
+transform = transforms.Compose(
+        [
+            transforms.Resize((256, 256)),
+            transforms.ToTensor(),
+            transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)),
+        ]
+    )
 
 
 def main(args):
@@ -31,29 +36,39 @@ def main(args):
 
 
     model = EncoderDecoderAttention()
-    vocab = None
+    val_dataset, val_loader = get_loader(
+        root_folder="../data/flickr8k/Images",
+        captions_file="../data/flickr8k/captions_val.txt",
+        transform=transform,
+        num_workers=2,
+    )
 
-    
+    train_dataset, train_loader = get_loader(
+        root_folder="../data/flickr8k/Images",
+        captions_file="../data/flickr8k/captions_train.txt",
+        transform=transform,
+        num_workers=2
+    )
 
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
     #scheduler = optim.lr_scheduler.StepLR(optimizer, args.step_size)
-    cross_entropy_loss = nn.CrossEntropyLoss().cuda()
+    cross_entropy_loss = nn.CrossEntropyLoss().to(device)
 
-    train_loader = torch.utils.data.DataLoader(
-        ImageCaptionDataset(data_transforms, args.data),
-        batch_size=args.batch_size, shuffle=True, num_workers=1)
+    # train_loader = torch.utils.data.DataLoader(
+    #     ImageCaptionDataset(data_transforms, args.data),
+    #     batch_size=args.batch_size, shuffle=True, num_workers=1)
 
-    val_loader = torch.utils.data.DataLoader(
-        ImageCaptionDataset(data_transforms, args.data, split_type='val'),
-        batch_size=args.batch_size, shuffle=True, num_workers=1)
+    # val_loader = torch.utils.data.DataLoader(
+    #     ImageCaptionDataset(data_transforms, args.data, split_type='val'),
+    #     batch_size=args.batch_size, shuffle=True, num_workers=1)
 
     print('Starting training with {}'.format(args))
     for epoch in range(1, args.epochs + 1):
         #scheduler.step()
         train(epoch, model, optimizer, cross_entropy_loss,
-              train_loader, vocab, args.alpha_c, args.log_interval, writer)
+              train_loader, train_dataset.vocab, args.alpha_c, args.log_interval, writer)
         validate(epoch, model, cross_entropy_loss, val_loader,
-                 vocab, args.alpha_c, args.log_interval, writer)
+                 val_dataset.vocab, args.alpha_c, args.log_interval, writer)
         model_file = 'model/model_epoch' + str(epoch) + '.pth'
         torch.save(model.state_dict(), model_file)
         print('Saved model to ' + model_file)
@@ -68,7 +83,8 @@ def train(epoch, model, optimizer, cross_entropy_loss, data_loader, vocab, alpha
     top1 = AverageMeter()
     top5 = AverageMeter()
     for batch_idx, (imgs, captions) in enumerate(data_loader):
-        imgs, captions = Variable(imgs).cuda(), Variable(captions).cuda()
+        # imgs, captions = Variable(imgs).cuda(), Variable(captions).cuda()
+        imgs, captions = imgs.to(device), captions.to(device)
         #img_features = encoder(imgs)
         optimizer.zero_grad()
         #preds, alphas = decoder(img_features, captions)
@@ -116,7 +132,8 @@ def validate(epoch, encoder, decoder, cross_entropy_loss, data_loader, vocab, al
     hypotheses = []
     with torch.no_grad():
         for batch_idx, (imgs, captions, all_captions) in enumerate(data_loader):
-            imgs, captions = Variable(imgs).cuda(), Variable(captions).cuda()
+            # imgs, captions = Variable(imgs).cuda(), Variable(captions).cuda()
+            imgs, captions = imgs.to(device), captions.to(device)
             img_features = encoder(imgs)
             preds, alphas = decoder(img_features, captions)
             targets = captions[:, 1:]
@@ -194,7 +211,7 @@ if __name__ == "__main__":
     parser.add_argument('--data', type=str, default='data/coco',
                         help='path to data images (default: data/coco)')
     parser.add_argument('--model', type=str, help='path to model')
-    parser.add_argument('--tf', action='store_true', default=False,
+    parser.add_argument('--tf', action='store_true', default=True,
                         help='Use teacher forcing when training LSTM (default: False)')
 
     main(parser.parse_args())
