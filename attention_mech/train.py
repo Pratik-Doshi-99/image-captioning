@@ -123,9 +123,8 @@ def train(epoch, model, optimizer, cross_entropy_loss, data_loader, vocab, alpha
     writer.add_scalar('train_top5_acc', top5.avg, epoch)
 
 
-def validate(epoch, encoder, decoder, cross_entropy_loss, data_loader, vocab, alpha_c, log_interval, writer):
-    encoder.eval()
-    decoder.eval()
+def validate(epoch, model, cross_entropy_loss, data_loader, vocab, alpha_c, log_interval, writer):
+    model.eval()
 
     losses = AverageMeter()
     top1 = AverageMeter()
@@ -138,8 +137,7 @@ def validate(epoch, encoder, decoder, cross_entropy_loss, data_loader, vocab, al
         for batch_idx, (imgs, captions, all_captions) in enumerate(data_loader):
             # imgs, captions = Variable(imgs).cuda(), Variable(captions).cuda()
             imgs, captions = imgs.to(device), captions.to(device)
-            img_features = encoder(imgs)
-            preds, alphas = decoder(img_features, captions)
+            preds, alphas = model(imgs, captions)
             targets = captions[:, 1:]
 
             targets = pack_padded_sequence(targets, [len(tar) - 1 for tar in targets], batch_first=True)[0]
