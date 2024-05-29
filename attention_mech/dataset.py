@@ -142,10 +142,11 @@ def generate_captions_file(dataset_keys, image_map, name):
 
 class FlickrDataset(Dataset):
 
-    def __init__(self,root_dir,captions_file,transform=None):
+    def __init__(self,root_dir,captions_file,split_type='train',transform=None):
         self.root_dir = root_dir
         self.df = pd.read_csv(captions_file)
         self.transform = transform
+        self.split_type = split_type
         
         #Get image and caption colum from the dataframe
         self.imgs = self.df["image"]
@@ -177,11 +178,18 @@ class FlickrDataset(Dataset):
         # Convert caption to indices
         caption_vec = self.caption_preprocessor.convertCaptionToIndices(caption,self.max_caption_length,self.vocab)
         
-        return img, torch.tensor(caption_vec)
+        if self.split_type == 'train':
+            return img, torch.tensor(caption_vec)
+        
+        #get the other captions of the same image
+        all_captions = [self.caption_preprocessor.convertCaptionToIndices(self.captions[idx],self.max_caption_length,self.vocab)
+                         for idx, image in enumerate(self.imgs) if image == img_name]
+        
+        return img, torch.tensor(caption_vec), torch.tensor(all_captions)
     
 
-def get_loader(root_folder,captions_file,transform,batch_size=32,num_workers=2,shuffle=True):
-    dataset = FlickrDataset(root_folder,captions_file,transform)
+def get_loader(root_folder,captions_file,transform,batch_size=32,num_workers=2,split_type='train',shuffle=True):
+    dataset = FlickrDataset(root_folder,captions_file,split_type,transform)
     data_loader = torch.utils.data.DataLoader(dataset=dataset,
                                               batch_size=batch_size,
                                               shuffle=shuffle,
