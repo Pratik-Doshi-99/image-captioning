@@ -185,16 +185,19 @@ def validate(epoch, model, cross_entropy_loss, data_loader, vocab, alpha_c, log_
         bleu_2 = corpus_bleu(references, hypotheses, weights=(0.5, 0.5, 0, 0))
         bleu_3 = corpus_bleu(references, hypotheses, weights=(0.33, 0.33, 0.33, 0))
         bleu_4 = corpus_bleu(references, hypotheses)
+        bleu_2_custom = corpus_bleu(references, hypotheses, weights=(0.6, 0.4, 0, 0))
 
         writer.add_scalar('val_bleu1', bleu_1, epoch)
         writer.add_scalar('val_bleu2', bleu_2, epoch)
         writer.add_scalar('val_bleu3', bleu_3, epoch)
         writer.add_scalar('val_bleu4', bleu_4, epoch)
+        writer.add_scalar('val_custom2', bleu_2_custom, epoch)
         print('Validation Epoch: {}\t'
+              'BLEU-2-cust ({})\t'
               'BLEU-1 ({})\t'
               'BLEU-2 ({})\t'
               'BLEU-3 ({})\t'
-              'BLEU-4 ({})\t'.format(epoch, bleu_1, bleu_2, bleu_3, bleu_4))
+              'BLEU-4 ({})\t'.format(epoch, bleu_2_custom, bleu_1, bleu_2, bleu_3, bleu_4))
 
 
 if __name__ == "__main__":
