@@ -69,11 +69,11 @@ def main(args):
 
     print('Starting training with {}'.format(args))
     for epoch in range(1, args.epochs + 1):
-        scheduler.step()
         train(epoch, model, optimizer, cross_entropy_loss,
               train_loader, train_dataset.vocab, args.alpha_c, args.log_interval, writer)
         validate(epoch, model, cross_entropy_loss, val_loader,
                  val_dataset.vocab, args.alpha_c, args.log_interval, writer)
+        scheduler.step()
         model_file = 'model/model_epoch' + str(epoch) + '.pth'
         torch.save(model.state_dict(), model_file)
         print('Saved model to ' + model_file)
