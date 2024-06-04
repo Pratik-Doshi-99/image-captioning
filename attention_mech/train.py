@@ -56,7 +56,7 @@ def main(args):
     model = EncoderDecoderAttention(256, 256, len(train_dataset.vocab))
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
-    #scheduler = optim.lr_scheduler.StepLR(optimizer, args.step_size)
+    scheduler = optim.lr_scheduler.StepLR(optimizer, args.step_size)
     cross_entropy_loss = nn.CrossEntropyLoss().to(device)
 
     # train_loader = torch.utils.data.DataLoader(
@@ -69,7 +69,7 @@ def main(args):
 
     print('Starting training with {}'.format(args))
     for epoch in range(1, args.epochs + 1):
-        #scheduler.step()
+        scheduler.step()
         train(epoch, model, optimizer, cross_entropy_loss,
               train_loader, train_dataset.vocab, args.alpha_c, args.log_interval, writer)
         validate(epoch, model, cross_entropy_loss, val_loader,
