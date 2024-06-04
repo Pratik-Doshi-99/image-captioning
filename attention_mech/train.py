@@ -52,7 +52,7 @@ def main(args):
         num_workers=1
     )
 
-
+    print('Loading model...')
     model = EncoderDecoderAttention(256, 256, len(train_dataset.vocab))
     model.to(device)
     optimizer = optim.Adam(model.parameters(), lr=args.lr)
