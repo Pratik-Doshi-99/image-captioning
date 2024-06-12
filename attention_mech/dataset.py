@@ -247,9 +247,9 @@ def get_flickr8k_captions(captions_path=None, skip_rows=1):
 
 device = get_default_device()
 # Download and unzip the ZIP file
-print(download_and_unzip(DATASET, DOWNLOAD_DIRECTORY, DEST_DIRECTORY))
+#print(download_and_unzip(DATASET, DOWNLOAD_DIRECTORY, DEST_DIRECTORY))
 # data_split()
 
 
 if __name__ =='__main__':
-    pass
+    print(download_and_unzip(DATASET, DOWNLOAD_DIRECTORY, DEST_DIRECTORY))
