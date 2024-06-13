@@ -1,6 +1,12 @@
 # Image Captioning using Transformers
 Image Captioning Project
 
+## Running the project
+
+Model Baseline: Training.ipynb
+Primary Model Training: attention_mech/train.py
+Primary Model Inference: Inference.ipynb
+
 
 ## Data
 Flick8k: https://www.kaggle.com/datasets/adityajn105/flickr8k
