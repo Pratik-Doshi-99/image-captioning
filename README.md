@@ -5,8 +5,7 @@ Image Captioning Project
 
 Model Baseline: Training.ipynb
 
-Primary Model Training: attention_mech/train.py
-
+Primary Model Training: attention_mech/train.py (view attention_mech/output.log for training logs)
 Primary Model Inference: Inference.ipynb
 
 
