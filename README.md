@@ -17,6 +17,7 @@ Primary Model Inference: Inference.ipynb
 
 
 ## Paper
+Find the pdf [here](https://pratik-doshi-99.github.io/projects/Bridging_Pixels_Words.pdf).
 
 ![page1](assets/pg1.png)
 ![page2](assets/pg2.png)
